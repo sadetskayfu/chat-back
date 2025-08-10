@@ -15,7 +15,7 @@ export class CleanupService {
 		try {
 			const deleted = await this.db.verificationCode.deleteMany({
 				where: {
-					OR: [{ expiresAt: { lt: now } }, { isUsed: true }],
+					expiresAt: { lt: now },
 				},
 			});
 			this.logger.log(`Deleted ${deleted.count} expired/used codes in ${now}`);
@@ -36,7 +36,6 @@ export class CleanupService {
 					isPhoneVerified: { equals: false },
 					verificationCodes: {
 						none: {
-							isUsed: false,
 							expiresAt: { gte: now },
 						},
 					},

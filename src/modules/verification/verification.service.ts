@@ -55,7 +55,7 @@ export class VerificationService {
 		type: VERIFICATION_TYPE
 	): Promise<boolean> {
 		const verification = await this.db.verificationCode.findFirst({
-			where: { userId, type, isUsed: false, expiresAt: { gte: new Date() } },
+			where: { userId, type, expiresAt: { gte: new Date() } },
 			orderBy: { createdAt: 'desc' },
 			select: {
 				id: true,
@@ -74,9 +74,8 @@ export class VerificationService {
 			throw new BadRequestException('Code is not valid');
 		}
 
-		await this.db.verificationCode.update({
+		await this.db.verificationCode.delete({
 			where: { id: verification.id },
-			data: { isUsed: true },
 		});
 
 		return true;

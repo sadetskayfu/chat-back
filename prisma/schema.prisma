@@ -10,7 +10,6 @@ datasource db {
 enum VerificationType {
     EMAIL
     PHONE
-    DEVICE
 }
 
 model User {
@@ -25,18 +24,7 @@ model User {
     isActive        Boolean  @default(true)
     createdAt       DateTime @default(now())
 
-    devices           Device[]
     verificationCodes VerificationCode[]
-}
-
-model Device {
-    id        Int      @id @default(autoincrement())
-    userId    Int
-    ipAddress String
-    lastLogin DateTime @default(now())
-    isTrusted Boolean  @default(false)
-
-    user User @relation(fields: [userId], references: [id])
 }
 
 model VerificationCode {
@@ -47,7 +35,6 @@ model VerificationCode {
     type      VerificationType
     createdAt DateTime         @default(now())
     expiresAt DateTime
-    isUsed    Boolean          @default(false)
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
