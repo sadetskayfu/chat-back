@@ -1,0 +1,1 @@
+export type VERIFICATION_TYPE = 'EMAIL' | 'PHONE'

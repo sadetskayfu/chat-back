@@ -1,0 +1,85 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum VerificationType {
+    EMAIL
+    PHONE
+    DEVICE
+}
+
+model User {
+    id              Int      @id @default(autoincrement())
+    email           String?  @unique
+    phone           String?  @unique
+    passwordHash    String?
+    passwordSalt    String?
+    googleId        String?  @unique
+    isEmailVerified Boolean  @default(false)
+    isPhoneVerified Boolean  @default(false)
+    isActive        Boolean  @default(true)
+    createdAt       DateTime @default(now())
+
+    devices           Device[]
+    verificationCodes VerificationCode[]
+}
+
+model Device {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    ipAddress String
+    lastLogin DateTime @default(now())
+    isTrusted Boolean  @default(false)
+
+    user User @relation(fields: [userId], references: [id])
+}
+
+model VerificationCode {
+    id        Int              @id @default(autoincrement())
+    userId    Int
+    codeHash  String
+    codeSalt  String
+    type      VerificationType
+    createdAt DateTime         @default(now())
+    expiresAt DateTime
+    isUsed    Boolean          @default(false)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// model Conversation {
+//     id           Int                       @id @default(autoincrement())
+//     messages     Message[]
+//     participants ConversationParticipant[]
+//     createdAt    DateTime                  @default(now())
+// }
+
+// model ConversationParticipant {
+//     id             Int          @id @default(autoincrement())
+//     userId         Int
+//     conversationId Int
+//     joinedAt       DateTime     @default(now())
+
+//     user           User         @relation(fields: [userId], references: [id])
+//     conversation   Conversation @relation(fields: [conversationId], references: [id])
+
+//     @@unique([userId, conversationId])
+// }
+
+// model Message {
+//     id             Int           @id @default(autoincrement())
+//     content        String        @db.VarChar(1000)
+//     senderId       Int           
+//     conversationId Int           
+//     createdAt      DateTime      @default(now())
+//     updatedAt      DateTime      @updatedAt
+//     status         MessageStatus @default(SENT)
+
+//     sender       User         @relation(fields: [senderId], references: [id])
+//     conversation Conversation @relation(fields: [conversationId], references: [id])
+// }
