@@ -4,22 +4,33 @@ import { ConfigService } from '../config/config.service';
 
 @Injectable()
 export class CookieService {
-	static tokenKey = 'access-token';
+	static accessTokenKey = 'access-token';
+    static refreshTokenKey = 'refresh-token';
 
     constructor(private configService: ConfigService) {}
 
-	setToken(res: Response, token: string) {
-        const ONE_DAY_MS = 24 * 60 * 60 * 1000
-
-		res.cookie(CookieService.tokenKey, token, {
+	setAccessToken(res: Response, token: string) {
+		res.cookie(CookieService.accessTokenKey, token, {
 			httpOnly: true,
 			sameSite: 'none',
 			secure: true,
-			maxAge: this.configService.get('COOKIE_EXPIRATION_DAYS', 14) * ONE_DAY_MS,
+			maxAge: this.configService.get('JWT_ACCESS_EXPIRATION_MINUTES') * 60 * 1000
 		});
 	}
 
-	removeToken(res: Response) {
-		res.clearCookie(CookieService.tokenKey);
+    setRefreshToken(res: Response, token: string) {
+        const ONE_DAY_MS = 24 * 60 * 60 * 1000
+
+        res.cookie(CookieService.refreshTokenKey, token, {
+			httpOnly: true,
+			sameSite: 'none',
+			secure: true,
+			maxAge: this.configService.get('JWT_REFRESH_EXPIRATION_DAY') * ONE_DAY_MS
+		});
+    }
+
+	removeTokens(res: Response) {
+        res.clearCookie(CookieService.accessTokenKey);
+        res.clearCookie(CookieService.refreshTokenKey);
 	}
 }

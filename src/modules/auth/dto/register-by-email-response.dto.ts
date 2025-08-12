@@ -5,6 +5,9 @@ export class RegisterByEmailResponseDto {
     userId: number
 
     @ApiProperty()
+    email: string
+
+    @ApiProperty()
     message: string
 
     @ApiProperty()

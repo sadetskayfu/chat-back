@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { DbService } from 'src/db/db.service';
 
 @Injectable()
@@ -8,7 +8,21 @@ export class CleanupService {
 
 	constructor(private db: DbService) {}
 
-	@Cron('0 */30 * * * *')
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+	async cleanExpiredTokens() {
+		const now = new Date();
+
+		try {
+			const deleted = await this.db.refreshToken.deleteMany({
+				where: { expiresAt: { lte: new Date() } },
+			});
+			this.logger.log(`Deleted ${deleted.count} expired refresh tokens in ${now}`);
+		} catch (error) {
+			this.logger.error(`Error while deleted expired refresh tokens: ${error.message}`);
+		}
+	}
+
+	@Cron(CronExpression.EVERY_30_MINUTES)
 	async deleteExpiredCodes() {
 		const now = new Date();
 
@@ -24,7 +38,7 @@ export class CleanupService {
 		}
 	}
 
-	@Cron('0 0 0 * * *')
+	@Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
 	async deleteNotVerifiedUsers() {
 		const now = new Date();
 

@@ -8,9 +8,11 @@ import { ConfigService } from '../config/config.service';
 import { CookieService } from './cookie.service';
 import { AuthController } from './auth.controller';
 import { ConfigModule } from '../config/config.module';
+import { DbModule } from 'src/db/db.module';
 
 @Module({
 	imports: [
+        DbModule,
         ConfigModule,
 		UserModule,
 		VerificationModule,
@@ -18,7 +20,6 @@ import { ConfigModule } from '../config/config.module';
             imports: [ConfigModule],
 			useFactory: async (config: ConfigService) => ({
 				secret: config.get('JWT_SECRET'),
-				signOptions: { expiresIn: `${config.get('JWT_TOKEN_EXPIRATION_DAYS', 14)}d` },
 			}),
             inject: [ConfigService]
 		}),

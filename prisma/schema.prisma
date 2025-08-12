@@ -23,8 +23,22 @@ model User {
     isPhoneVerified Boolean  @default(false)
     isActive        Boolean  @default(true)
     createdAt       DateTime @default(now())
+    refreshToken    RefreshToken[]
 
     verificationCodes VerificationCode[]
+}
+
+model RefreshToken {
+    id         Int      @id @default(autoincrement())
+    userId     Int
+    token      String
+    userAgent  String
+    createdAt  DateTime @default(now())
+    expiresAt  DateTime
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 model VerificationCode {
